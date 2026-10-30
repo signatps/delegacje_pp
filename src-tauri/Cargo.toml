@@ -1,0 +1,31 @@
+[package]
+name = "delegacje-pp"
+version = "0.1.0"
+description = "Aplikacja desktopowa do delegacji służbowych"
+authors = ["Delegacje PP"]
+edition = "2021"
+rust-version = "1.85"
+
+[workspace]
+members = [".", "crates/calculations"]
+
+[lib]
+name = "delegacje_pp_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+calculations = { path = "crates/calculations" }
+
+[profile.release]
+codegen-units = 1
+lto = true
+opt-level = 3
+panic = "abort"
+strip = true
