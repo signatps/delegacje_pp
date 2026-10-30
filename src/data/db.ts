@@ -8,20 +8,21 @@ let SQL: SqlJsStatic | null = null;
 let db: Database | null = null;
 let persistTimer: ReturnType<typeof setTimeout> | null = null;
 
+type SqlJsInit = (cfg?: { locateFile?: (file: string) => string }) => Promise<SqlJsStatic>;
+
 async function loadSqlJs(): Promise<SqlJsStatic> {
   if (SQL) return SQL;
   // Vite may resolve sql.js without a default ESM export — handle both shapes.
-  const mod = (await import("sql.js")) as { default?: (cfg?: object) => Promise<SqlJsStatic> } & ((
-    cfg?: object,
-  ) => Promise<SqlJsStatic>);
-  const init = typeof mod === "function" ? mod : mod.default;
-  if (!init) {
+  const mod = (await import("sql.js")) as unknown as SqlJsInit | { default: SqlJsInit };
+  const init: SqlJsInit = typeof mod === "function" ? mod : mod.default;
+  if (typeof init !== "function") {
     throw new Error("Nie udało się załadować sql.js");
   }
-  SQL = await init({
+  const loaded = await init({
     locateFile: (file: string) => `/${file}`,
   });
-  return SQL;
+  SQL = loaded;
+  return loaded;
 }
 
 function persistSoon() {
