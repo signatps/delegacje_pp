@@ -35,4 +35,6 @@ src-tauri/gen/schemas
 *.pem
 *.p12
 *.key
+tsconfig.tsbuildinfo
+*.tsbuildinfo
 
