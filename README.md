@@ -46,9 +46,26 @@ npm run tauri:build
 ### Minimalne wersje systemów
 
 - Windows: **10/11 64-bit** (konfigurowalne w Ustawieniach)
-- macOS: domyślnie **14+** (Sonoma) — wartość jest **łatwa do zmiany** w Ustawieniach i w `tauri.conf.json` (`bundle.macOS.minimumSystemVersion`). Specyfikacja wskazywała „macOS 27+”; przed dystrybucją zweryfikuj faktyczną dostępność docelowej wersji oraz wsparcie Apple Silicon / Intel dla wybranego toolchainu.
+- macOS: domyślnie **14+** (Sonoma), **tylko Apple Silicon (arm64)** w CI. Wartość minimum jest **łatwa do zmiany** w Ustawieniach i w `tauri.conf.json`. Specyfikacja wskazywała „macOS 27+” — zweryfikuj przed dystrybucją.
+- Linux i macOS Intel: **wyłączone w CI** (oszczędność minut Actions); można przywrócić później.
 
-Podpisywanie i notaryzacja macOS: skonfiguruj certyfikaty Apple w sekretach CI / lokalnym keychain przed publikacją instalatorów.
+### macOS: komunikat „aplikacja jest uszkodzona”
+
+Buildy CI są **niepodpisane Developer ID** (tylko ad-hoc). Safari/Gatekeeper oznacza pobrany plik kwarantanną i pokazuje ten komunikat mimo że plik jest OK.
+
+Po pobraniu artefaktu (`.app` / ZIP):
+
+```bash
+# usuń kwarantannę Gatekeeper (najczęstsza przyczyna)
+xattr -cr "/sciezka/do/Delegacje PP.app"
+
+# ewentualnie jawna zgoda w terminalu
+open "/sciezka/do/Delegacje PP.app"
+```
+
+Albo: **Ustawienia systemowe → Prywatność i ochrona → „Otwórz mimo to”** po pierwszej próbie uruchomienia.
+
+Produkcja wymaga Apple Developer ID + notaryzacji (sekrety CI) — issue #18.
 
 ## Co jest zaimplementowane (v0.1)
 

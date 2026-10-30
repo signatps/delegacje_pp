@@ -36,6 +36,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
       - run: cargo test --manifest-path src-tauri/crates/calculations/Cargo.toml
 
+  # Linux i macOS Intel celowo wyłączone — oszczędność minut Actions.
+  # Przywróć osobnymi jobami dopiero przy dystrybucji produkcyjnej.
   build-tauri:
     name: Build Tauri (${{ matrix.name }})
     needs: [test-frontend, test-rust]
@@ -47,16 +49,8 @@ jobs:
             platform: macos-latest
             args: "--target aarch64-apple-darwin"
             rust_targets: aarch64-apple-darwin
-          - name: macos-x64
-            platform: macos-latest
-            args: "--target x86_64-apple-darwin"
-            rust_targets: x86_64-apple-darwin
           - name: windows
             platform: windows-latest
-            args: ""
-            rust_targets: ""
-          - name: linux
-            platform: ubuntu-22.04
             args: ""
             rust_targets: ""
     runs-on: ${{ matrix.platform }}
@@ -67,12 +61,6 @@ jobs:
         with:
           node-version: "22"
           cache: npm
-
-      - name: Install Linux deps
-        if: matrix.name == 'linux'
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
 
       - uses: dtolnay/rust-toolchain@stable
         with:
@@ -90,6 +78,27 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           args: ${{ matrix.args }}
+
+      # Niepodpisany .app z Safari/GitHub dostaje kwarantannę Gatekeeper → komunikat „uszkodzona”.
+      # Ad-hoc codesign + ZIP ułatwia lokalne testy; produkcja wymaga Apple Developer ID + notaryzacji.
+      - name: Ad-hoc sign macOS app and pack ZIP
+        if: matrix.name == 'macos-arm64'
+        shell: bash
+        run: |
+          set -euo pipefail
+          APP=$(find src-tauri/target -type d -name "Delegacje PP.app" | head -n 1)
+          if [[ -z "${APP}" ]]; then
+            echo "Nie znaleziono Delegacje PP.app"
+            find src-tauri/target -path '*bundle*' -maxdepth 6 -print || true
+            exit 1
+          fi
+          echo "Signing: ${APP}"
+          codesign --force --deep --sign - "${APP}"
+          codesign --verify --verbose=2 "${APP}" || true
+          OUT_DIR="src-tauri/target/aarch64-apple-darwin/release/bundle/macos"
+          mkdir -p "${OUT_DIR}"
+          ditto -c -k --sequesterRsrc --keepParent "${APP}" "${OUT_DIR}/Delegacje-PP-macos-arm64-unsigned.zip"
+          ls -la "${OUT_DIR}"
 
       - uses: actions/upload-artifact@v4
         with:
