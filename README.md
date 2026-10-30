@@ -79,7 +79,7 @@ Produkcja wymaga Apple Developer ID + notaryzacji (sekrety CI) — issue #18.
 - Kursy NBP + kurs ręczny z uzasadnieniem
 - PDF: zlecenie, rozliczenie, ewidencja km
 - Kopia / odtworzenie / reset bazy SQLite
-- GitHub Actions: testy + build Tauri (Windows, macOS arm64/x64, Linux)
+- GitHub Actions: testy + build Tauri (**Windows**, **macOS Apple Silicon**); Linux/Intel wyłączone
 
 ## Ograniczenia i decyzje księgowe
 
