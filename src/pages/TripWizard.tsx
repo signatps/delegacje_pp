@@ -2,10 +2,12 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 import { Alert, Button, Field, Input, PageHeader, Select, Textarea } from "../components/ui";
+import { RouteMap } from "../components/RouteMap";
 import { useAppData } from "../state/AppData";
 import { nextTripNumber, saveTrip } from "../data/repository";
 import type { BusinessTrip, TransportMode } from "../domain/types";
 import { TRANSPORT_LABELS } from "../domain/types";
+import { planRouteFromPlaces, type GeoPoint } from "../services/osm";
 
 const STEPS = [
   "Pracownik i cel",
@@ -23,6 +25,10 @@ export function TripWizardPage() {
   const [step, setStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [mapKm, setMapKm] = useState("");
+  const [routingBusy, setRoutingBusy] = useState(false);
+  const [routePoints, setRoutePoints] = useState<GeoPoint[]>([]);
+  const [routeCoords, setRouteCoords] = useState<Array<[number, number]>>([]);
+  const [routeMeta, setRouteMeta] = useState<string | null>(null);
   const [form, setForm] = useState({
     employeeId: employees[0]?.id ?? "",
     purpose: "",
@@ -49,9 +55,27 @@ export function TripWizardPage() {
     notes: "",
   });
 
-  const canManualRoute = settings?.mapProvider === "manual" || !settings?.mapApiKey;
+  const useOsm = settings?.mapProvider === "osm";
 
   const previewNumber = useMemo(() => "…", []);
+
+  async function runOsmRouting() {
+    setError(null);
+    setRoutingBusy(true);
+    try {
+      const places = [form.startPlace, ...form.destinations.split(/[,→]/).map((s) => s.trim()).filter(Boolean)];
+      const { points, route } = await planRouteFromPlaces(places, settings?.routingServerUrl);
+      setRoutePoints(points);
+      setRouteCoords(route.coordinates);
+      setMapKm(route.distanceKm);
+      setForm((f) => ({ ...f, plannedDistanceKm: route.distanceKm }));
+      setRouteMeta(`${route.distanceKm} km · ok. ${route.durationMin} min · ${route.attribution}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setRoutingBusy(false);
+    }
+  }
 
   async function saveDraft(status: BusinessTrip["status"] = "draft") {
     setError(null);
@@ -262,9 +286,13 @@ export function TripWizardPage() {
         {step === 3 && (
           <div className="space-y-3">
             <Alert tone="info">
-              Mapa jest pomocnicza i nie zastępuje rzeczywistego przebiegu. Offline / bez klucza API: wprowadź trasę ręcznie
-              {canManualRoute ? " (tryb ręczny aktywny)." : "."}
+              Mapa OpenStreetMap jest pomocnicza i nie zastępuje rzeczywistego przebiegu. Offline: wprowadź dystans ręcznie.
+              {useOsm ? " Aktywny dostawca: darmowy OSM (Photon + OSRM)." : " Tryb ręczny — włącz OSM w Ustawieniach."}
             </Alert>
+            {useOsm && (routeCoords.length > 0 || routePoints.length > 0) ? (
+              <RouteMap points={routePoints} coordinates={routeCoords} />
+            ) : null}
+            {routeMeta ? <p className="text-sm text-[var(--muted)]">{routeMeta}</p> : null}
             <div className="grid gap-3 md:grid-cols-2">
               <Field label="Dystans wg mapy / planu (km)">
                 <Input value={form.plannedDistanceKm || mapKm} onChange={(e) => { setMapKm(e.target.value); setForm({ ...form, plannedDistanceKm: e.target.value }); }} />
@@ -278,17 +306,26 @@ export function TripWizardPage() {
                 </Field>
               </div>
             </div>
-            <Button
-              variant="secondary"
-              type="button"
-              onClick={() => {
-                // Controlled manual "routing" stub — no silent fake geocoding
-                setMapKm(form.plannedDistanceKm || "0");
-                alert("Routing zewnętrzny wymaga konfiguracji dostawcy w Ustawieniach. Zapisano tryb ręczny.");
-              }}
-            >
-              Test połączenia / routing
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                variant="secondary"
+                type="button"
+                disabled={!useOsm || routingBusy}
+                onClick={() => void runOsmRouting()}
+              >
+                {routingBusy ? "Wyznaczanie trasy OSM…" : "Wyznacz trasę (OpenStreetMap)"}
+              </Button>
+              <Button
+                variant="ghost"
+                type="button"
+                onClick={() => {
+                  setMapKm(form.plannedDistanceKm || "0");
+                  setRouteMeta("Tryb ręczny — dystans bez routingu zewnętrznego.");
+                }}
+              >
+                Tylko ręcznie
+              </Button>
+            </div>
           </div>
         )}
 

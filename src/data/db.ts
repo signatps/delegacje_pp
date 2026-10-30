@@ -2,7 +2,7 @@ import type { Database, SqlJsStatic } from "sql.js";
 import { SCHEMA_SQL } from "./schema.sql";
 import { seedIfEmpty } from "./seed";
 
-const STORAGE_KEY = "delegacje_pp_sqlite_v1";
+const STORAGE_KEY = "delegacje_pp_sqlite_v2_proplus";
 
 let SQL: SqlJsStatic | null = null;
 let db: Database | null = null;

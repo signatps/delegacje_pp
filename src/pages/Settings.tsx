@@ -4,6 +4,7 @@ import { useAppData } from "../state/AppData";
 import { getCompany, saveSettings, updateCompany } from "../data/repository";
 import { exportDatabaseBackup, importDatabaseBackup, resetDatabase } from "../data/db";
 import type { AppSettings, Company } from "../domain/types";
+import { BRAND } from "../branding";
 
 export function SettingsPage() {
   const { settings, refresh, company } = useAppData();
@@ -58,15 +59,37 @@ export function SettingsPage() {
             />
             Uproszczony obieg zatwierdzeń
           </label>
-          <Button
-            onClick={async () => {
-              await updateCompany(firm);
-              await refresh();
-              setMsg("Zapisano dane firmy.");
-            }}
-          >
-            Zapisz firmę
-          </Button>
+          <p className="text-xs text-[var(--muted)]">
+            KRS {BRAND.krs} · REGON {BRAND.regon} · {BRAND.email} · {BRAND.phone}
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              onClick={async () => {
+                await updateCompany(firm);
+                await refresh();
+                setMsg("Zapisano dane firmy.");
+              }}
+            >
+              Zapisz firmę
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={() =>
+                setFirm({
+                  ...firm,
+                  name: BRAND.companyLegalName,
+                  nip: BRAND.nip,
+                  address: BRAND.address,
+                  city: BRAND.city,
+                  postalCode: BRAND.postalCode,
+                  logoDataUrl: BRAND.logoPath,
+                  tripNumberPrefix: BRAND.tripNumberPrefix,
+                })
+              }
+            >
+              Wczytaj dane Pro-PLUS SA
+            </Button>
+          </div>
         </div>
 
         <div className="space-y-3 rounded-lg border border-[var(--color-border)] bg-[var(--panel)] p-4">
@@ -101,15 +124,23 @@ export function SettingsPage() {
               value={local.mapProvider}
               onChange={(e) => setLocal({ ...local, mapProvider: e.target.value as AppSettings["mapProvider"] })}
             >
+              <option value="osm">OpenStreetMap (darmowy: Photon + OSRM)</option>
               <option value="manual">Ręczny (offline)</option>
-              <option value="osm">OpenStreetMap / własny serwer</option>
             </Select>
           </Field>
-          <Field label="Klucz API map (opcjonalnie)">
+          <p className="text-xs text-[var(--muted)]">
+            OSM nie wymaga klucza API. Adresy i trasa są wysyłane do publicznych serwisów (Photon/OSRM) — respektuj ich limity.
+            Przy większym ruchu ustaw własny serwer routingu poniżej.
+          </p>
+          <Field label="Klucz API map (opcjonalnie, inne dostawcy)">
             <Input value={local.mapApiKey ?? ""} onChange={(e) => setLocal({ ...local, mapApiKey: e.target.value || null })} />
           </Field>
-          <Field label="URL własnego serwera routingu">
-            <Input value={local.routingServerUrl ?? ""} onChange={(e) => setLocal({ ...local, routingServerUrl: e.target.value || null })} />
+          <Field label="URL własnego serwera OSRM (opcjonalnie)">
+            <Input
+              placeholder="https://router.project-osrm.org"
+              value={local.routingServerUrl ?? ""}
+              onChange={(e) => setLocal({ ...local, routingServerUrl: e.target.value || null })}
+            />
           </Field>
           <Button
             onClick={async () => {

@@ -9,7 +9,14 @@ function addHeader(doc: jsPDF, company: Company, title: string, number: string) 
   doc.text(company.name, 14, 18);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(10);
-  doc.text([company.address, `${company.postalCode ?? ""} ${company.city ?? ""}`].filter(Boolean).join(", "), 14, 24);
+  const line2 = [
+    company.address,
+    `${company.postalCode ?? ""} ${company.city ?? ""}`.trim(),
+    company.nip ? `NIP ${company.nip}` : null,
+  ]
+    .filter(Boolean)
+    .join(", ");
+  doc.text(line2, 14, 24);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
   doc.text(title, 14, 40);

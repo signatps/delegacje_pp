@@ -227,7 +227,7 @@ CREATE TABLE IF NOT EXISTS app_settings (
   id TEXT PRIMARY KEY,
   theme TEXT NOT NULL DEFAULT 'light',
   locale TEXT NOT NULL DEFAULT 'pl',
-  map_provider TEXT NOT NULL DEFAULT 'manual',
+  map_provider TEXT NOT NULL DEFAULT 'osm',
   map_api_key TEXT,
   routing_server_url TEXT,
   nbp_enabled INTEGER NOT NULL DEFAULT 1,

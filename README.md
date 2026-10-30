@@ -1,6 +1,6 @@
 # Delegacje PP
 
-Aplikacja desktopowa (Tauri 2 + React + TypeScript + SQLite) do tworzenia, obsługi i rozliczania podróży służbowych pracowników w Polsce i za granicą — z myślą o małych i średnich polskich pracodawcach.
+Aplikacja desktopowa (Tauri 2 + React + TypeScript + SQLite) do tworzenia, obsługi i rozliczania podróży służbowych — branding i dane pracodawcy: **PRO-PLUS S.A.** (ul. Śnieżna 3, 03-750 Warszawa, NIP 5213282953). Mapy/trasy: darmowe **OpenStreetMap** (Photon + OSRM).
 
 **Repozytorium:** [github.com/signatps/delegacje_pp](https://github.com/signatps/delegacje_pp)  
 **Project board:** [Delegacje PP](https://github.com/users/signatps/projects/18)  

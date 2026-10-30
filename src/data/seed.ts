@@ -1,5 +1,6 @@
 import type { Database } from "sql.js";
 import { v4 as uuid } from "uuid";
+import { BRAND } from "../branding";
 
 const now = () => new Date().toISOString();
 
@@ -17,8 +18,18 @@ export function seedIfEmpty(db: Database) {
 
   db.run(
     `INSERT INTO company(id, name, nip, address, city, postal_code, logo_data_url, trip_number_prefix, trip_number_next, simplify_workflow, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, NULL, 'DEL/2026/', 1, 0, ?)`,
-    [companyId, "Przykładowa Sp. z o.o.", "5250000000", "ul. Marszałkowska 1", "Warszawa", "00-001", t],
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, 1, 0, ?)`,
+    [
+      companyId,
+      BRAND.companyLegalName,
+      BRAND.nip,
+      BRAND.address,
+      BRAND.city,
+      BRAND.postalCode,
+      BRAND.logoPath,
+      BRAND.tripNumberPrefix,
+      t,
+    ],
   );
 
   db.run(
@@ -108,7 +119,7 @@ export function seedIfEmpty(db: Database) {
 
   db.run(
     `INSERT INTO app_settings(id, theme, locale, map_provider, map_api_key, routing_server_url, nbp_enabled, min_windows_version, min_macos_version, last_backup_at)
-     VALUES ('default', 'light', 'pl', 'manual', NULL, NULL, 1, '10', '14', NULL)`,
+     VALUES ('default', 'light', 'pl', 'osm', NULL, NULL, 1, '10', '14', NULL)`,
   );
 
   db.run(

@@ -18,6 +18,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import { useAppData } from "../state/AppData";
 import { Button, Input } from "./ui";
+import { BRAND } from "../branding";
 
 const NAV = [
   { to: "/", label: "Pulpit", icon: LayoutDashboard, end: true },
@@ -70,7 +71,12 @@ export function AppShell() {
     <div className="flex min-h-screen">
       <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col bg-[var(--sidebar)] text-[var(--sidebar-text)] md:flex">
         <div className="border-b border-white/10 px-5 py-5">
-          <div className="text-xs uppercase tracking-[0.2em] text-accent-500">Delegacje PP</div>
+          <img
+            src={company?.logoDataUrl || BRAND.logoPath}
+            alt={BRAND.companyShortName}
+            className="mb-3 h-8 w-auto max-w-full object-contain object-left"
+          />
+          <div className="text-xs uppercase tracking-[0.18em] text-[var(--brand-blue)]">{BRAND.productName}</div>
           <div className="mt-1 font-display text-xl font-semibold leading-tight">{brand}</div>
           <div className="mt-2 text-xs text-white/60">Praca jednostanowiskowa · offline-first</div>
         </div>
@@ -92,7 +98,8 @@ export function AppShell() {
           ))}
         </nav>
         <div className="border-t border-white/10 p-4 text-xs text-white/55">
-          Windows {company ? "10/11" : "—"} · macOS 14+ (konfigurowalne)
+          <div>{BRAND.city} · NIP {BRAND.nip}</div>
+          <div className="mt-1">Windows 10/11 · macOS 14+ (Apple Silicon)</div>
         </div>
       </aside>
 
