@@ -2,7 +2,10 @@
 
 Aplikacja desktopowa (Tauri 2 + React + TypeScript + SQLite) do tworzenia, obsługi i rozliczania podróży służbowych pracowników w Polsce i za granicą — z myślą o małych i średnich polskich pracodawcach.
 
-**Repozytorium:** [github.com/signatps/delegacje_pp](https://github.com/signatps/delegacje_pp)
+**Repozytorium:** [github.com/signatps/delegacje_pp](https://github.com/signatps/delegacje_pp)  
+**Project board:** [Delegacje PP](https://github.com/users/signatps/projects/18)  
+**Issues:** [lista zgłoszeń](https://github.com/signatps/delegacje_pp/issues)  
+**CI:** [GitHub Actions](https://github.com/signatps/delegacje_pp/actions)
 
 ## Stack
 

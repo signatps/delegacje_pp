@@ -35,8 +35,10 @@ export function TripsPage() {
             return (
               <tr key={t.id} className="border-t border-[var(--color-border)]">
                 <td className="px-3 py-2 font-medium">
-                  {t.number}
-                  {t.isForeign ? <Badge tone="accent">Zagraniczna</Badge> : null}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span>{t.number}</span>
+                    {t.isForeign ? <Badge tone="accent">Zagraniczna</Badge> : null}
+                  </div>
                 </td>
                 <td className="px-3 py-2">
                   {emp ? `${emp.firstName} ${emp.lastName}` : "—"}

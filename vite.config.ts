@@ -29,6 +29,7 @@ export default defineConfig({
     host: "127.0.0.1",
   },
   optimizeDeps: {
-    exclude: ["sql.js"],
+    include: ["sql.js"],
   },
+  assetsInclude: ["**/*.wasm"],
 });

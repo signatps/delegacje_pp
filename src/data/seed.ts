@@ -27,9 +27,9 @@ export function seedIfEmpty(db: Database) {
   );
 
   const employees = [
-    [emp1, "Anna", "Kowalska", "E-001", "Specjalista ds. sprzedaży", "Sprzedaż", "anna.kowalska@firma.pl", "Warszawa"],
-    [emp2, "Piotr", "Nowak", "E-002", "Kierownik projektu", "IT", "piotr.nowak@firma.pl", "Warszawa"],
-    [emp3, "Maria", "Wiśniewska", "E-003", "Księgowa", "Finanse", "maria.wisniewska@firma.pl", "Kraków"],
+    [emp1, "Anna", "Kowalska", "E-001", "Specjalista ds. sprzedaży", "Sprzedaż", "anna.kowalska@firma.pl", "Warszawa", "Warszawa"],
+    [emp2, "Piotr", "Nowak", "E-002", "Kierownik projektu", "IT", "piotr.nowak@firma.pl", "Warszawa", "Warszawa"],
+    [emp3, "Maria", "Wiśniewska", "E-003", "Księgowa", "Finanse", "maria.wisniewska@firma.pl", "Kraków", "Kraków"],
   ] as const;
 
   for (const e of employees) {
